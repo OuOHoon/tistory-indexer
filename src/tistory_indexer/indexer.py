@@ -80,16 +80,6 @@ class TistoryIndexer:
         except Exception as e:
             logging.error(f"Error in run(): {e}")
 
-    def load_credentials(self):
-        scopes = [
-            "https://www.googleapis.com/auth/indexing",
-            "https://www.googleapis.com/auth/webmasters"
-        ]
-        return service_account.Credentials.from_service_account_file(
-            self.credentials_path,
-            scopes=scopes
-        )
-
     def fetch_urls_from_sitemap(self):
         """
         Parse sitemap.xml and return all URLs that include both <loc> and <lastmod>.
