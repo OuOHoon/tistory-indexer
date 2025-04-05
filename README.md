@@ -1,15 +1,18 @@
 # tistory-indexer
 
+![PyPI](https://img.shields.io/pypi/v/tistory-indexer)
+![Python](https://img.shields.io/pypi/pyversions/tistory-indexer)
+![License](https://img.shields.io/github/license/ouohoon/tistory-indexer)
+
 티스토리(Tistory) 블로그 글을 자동으로 Google Search Console (GSC)에 색인 요청하는 파이썬 라이브러리입니다.
 
-
-> ✅ 블로그가 GSC에 등록되어 있어야 하며, 서비스 계정이 소유자로 추가되어야 합니다.
+> ✅ 블로그가 GSC에 등록되어 있어야 하며, OAuth 인증이 필요합니다.
 
 ---
 
 ## 🚀 주요 기능
 
-- 티스토리 블로그에서 전체 글 자동 수집 (가장 최근 글부터 순서대로 처리)
+- 티스토리 블로그에서 전체 글 자동 수집 (가장 최근 수정된 글부터 순서대로 처리)
 - Google Indexing API를 통해 자동 색인 요청
 - 이미 색인된 글은 건너뜀 (중복 방지)
 - 크론(cron) 또는 GitHub Actions로 자동 실행 가능
@@ -17,6 +20,8 @@
 ---
 
 ## 📦 설치 방법
+
+Python 3.11 이상에서 다음 명령어로 설치할 수 있습니다:
 
 ```bash
 pip install tistory-indexer
@@ -26,46 +31,52 @@ pip install tistory-indexer
 
 ## ⚙️ 사전 준비
 
-1.	Google Cloud Console에서 프로젝트 생성
-2.	Web Search Indexing API, Google Search Console API 활성화
-3.	서비스 계정 생성 및 JSON 키 다운로드 (예: gsc-key.json)
-4.	해당 서비스 계정 이메일을 GSC 소유자 권한으로 추가
+1. Google Cloud Console에서 프로젝트 생성
+2. Web Search Indexing API, Google Search Console API 활성화
+3. OAuth 클라이언트 ID 생성 (애플리케이션 유형: 데스크톱 앱)
+4. JSON 형식의 클라이언트 ID 파일 다운로드 (예: oauth_credentials.json)
+5. OAuth 동의 화면 > 대상 > 테스트 사용자에서 자신의 이메일 주소를 추가
 
 ---
 
 ## 🧪 사용 방법
+
 ```python
 from tistory_indexer import TistoryIndexer
 
 indexer = TistoryIndexer(
     tistory_blog_url="https://your-blog.tistory.com",
-    credentials_path="gsc-key.json"
+    oauth_credentials_path="oauth_credentials.json"
 )
 
-indexer.run()  # 전체 글 수집 후 색인 요청
+indexer.run(pages=5)  # 가장 최근 수정된 글 중 최대 5개 색인 요청
 ```
 
 ---
 
 ## ⚙️ 옵션 설명
 
-|**옵션**|**설명**|
-|:---|:---|
-|tistory_blog_url|티스토리 블로그 주소|
-|credentials_path|서비스 계정 키(JSON) 경로|
+| **옵션**               | **설명**                            |
+| ---------------------- | ----------------------------------- |
+| tistory_blog_url       | 티스토리 블로그 주소                |
+| oauth_credentials_path | OAuth 클라이언트 키(JSON) 파일 경로 |
 
 ---
 
 ## 🔄 자동 실행 예시
+
 🖥 로컬에서 크론(cron) 설정
+
 ```cron
-0 0 * * * /usr/bin/python3 /path/to/run_indexer.py
+0 0 * * * /usr/bin/python3 /path/to/main.py
 ```
+
 ☁️ GitHub Actions 예시
+
 ```yaml
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   index:
@@ -74,23 +85,29 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - run: pip install tistory-indexer
-      - run: python run_indexer.py
+      - run: python main.py
 ```
 
 ---
 
 📋 요구 사항
--	Python 3.8 이상
--	google-auth, requests, beautifulsoup4
-→ 설치 시 자동으로 포함됨
+
+- Python 3.11 이상
+- 설치 시 다음 의존성이 자동으로 포함됩니다:
+  - google-auth
+  - google-auth-oauthlib
+  - requests
+  - beautifulsoup4
+  - lxml
 
 ---
 
 📜 라이선스
 
-MIT License © 2025 OuOHoon
+MIT License © 2025 OuOHoon  
+GitHub: [@ouohoon](https://github.com/ouohoon)
 
 자세한 내용은 LICENSE 파일을 참고하세요.
 
@@ -106,8 +123,15 @@ MIT License © 2025 OuOHoon
 
 🙋 자주 묻는 질문 (FAQ)
 
-Q. 색인 요청을 자주 보내도 되나요?
--	Google Indexing API는 무료 사용자의 하루 요청 횟수에 제한(기본적으로 200개)이 있습니다. 무분별한 요청은 피해주세요.
+Q. OAuth 인증은 어떻게 하나요?
 
-Q. 서비스 계정을 Search Console에 어떻게 추가하나요?
--	GSC에서 사이트를 클릭 → 설정 → 사용자 및 권한 → 서비스 계정 이메일 추가 + 소유자 권한 부여
+- 최초 실행 시 브라우저를 통해 Google 로그인 창이 나타납니다. 로그인 후 생성된 token.json 파일이 자동 저장되며, 이후에는 자동으로 인증됩니다.
+
+Q. 색인 요청을 자주 보내도 되나요?
+
+- Google Indexing API는 무료 사용자의 하루 요청 횟수에 제한(기본적으로 200개)이 있습니다. 무분별한 요청은 피해주세요.
+
+Q. API로 색인 상태를 조회하면 "NEUTRAL"이 뜨는데, GSC에서는 "색인 등록됨"이라고 나와요. 왜 그런가요?
+
+- Google Search Console API에서 반환하는 `verdict` 값은 실시간 검사 결과 또는 제한된 분석 기반으로 판단됩니다. 실제 색인 상태와 달리 "NEUTRAL"로 나올 수 있으며, 이는 색인이 안 됐다는 의미는 아닙니다.
+- 색인 여부는 GSC 웹 UI의 색인 상태도 함께 참고하는 것이 좋습니다.
