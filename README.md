@@ -2,7 +2,6 @@
 
 ![PyPI](https://img.shields.io/pypi/v/tistory-indexer)
 ![Python](https://img.shields.io/pypi/pyversions/tistory-indexer)
-![License](https://img.shields.io/github/license/ouohoon/tistory-indexer)
 
 티스토리(Tistory) 블로그 글을 자동으로 Google Search Console (GSC)에 색인 요청하는 파이썬 라이브러리입니다.
 
