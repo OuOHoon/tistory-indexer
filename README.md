@@ -14,7 +14,6 @@
 - 티스토리 블로그에서 전체 글 자동 수집 (가장 최근 수정된 글부터 순서대로 처리)
 - Google Indexing API를 통해 자동 색인 요청
 - 이미 색인된 글은 건너뜀 (중복 방지)
-- 크론(cron) 또는 GitHub Actions로 자동 실행 가능
 
 ---
 
@@ -59,35 +58,6 @@ indexer.run(pages=5)  # 가장 최근 수정된 글 중 최대 5개 색인 요�
 | ---------------------- | ----------------------------------- |
 | tistory_blog_url       | 티스토리 블로그 주소                |
 | oauth_credentials_path | OAuth 클라이언트 키(JSON) 파일 경로 |
-
----
-
-## 🔄 자동 실행 예시
-
-🖥 로컬에서 크론(cron) 설정
-
-```cron
-0 0 * * * /usr/bin/python3 /path/to/main.py
-```
-
-☁️ GitHub Actions 예시
-
-```yaml
-on:
-  schedule:
-    - cron: "0 0 * * *"
-
-jobs:
-  index:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - run: pip install tistory-indexer
-      - run: python main.py
-```
 
 ---
 
