@@ -225,4 +225,7 @@ pyrightconfig.json
 .history
 .ionide
 
+# Google Application Credentials
+gsc-key.json
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,python
